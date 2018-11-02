@@ -11,45 +11,61 @@ from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import classification_report
 from sklearn.metrics import confusion_matrix
 from sklearn.metrics import accuracy_score
-from sklearn.svm import SVC
+from sklearn.ensemble import RandomForestClassifier
+import pandas as pd
 
 print(__doc__)
+
+pd.set_option('display.max_columns', 500)
+pd.set_option('display.width', 1000)
+
+# Abalone Data
+df = pd.read_csv('./data/wine/wine.csv',
+                 header=None,
+                 names=['Quality',
+                        'Alcohol',
+                        'MalicAcid',
+                        'Ash',
+                        'Alcalinity',
+                        'Magnesium',
+                        'Phenols',
+                        'Flavanoids',
+                        'NonflavanoidPhenols',
+                        'Proanthocyanins',
+                        'ColorIntensity',
+                        'Hue',
+                        'OD280/OD315',
+                        'Proline'])
+
+
+print(df[0:5])
 
 # Loading the Digits dataset
 digits = datasets.load_digits()
 
+# Split into our data and targets
+X = df.drop(['Quality'], axis=1).values
+y = df['Quality'].values
 
-# To apply an classifier on this data, we need to flatten the image, to
-# turn the data in a (samples, feature) matrix:
-n_samples = len(digits.images)
-X = digits.images.reshape((n_samples, -1))
-y = digits.target
-
-print(X[0:5])
-print(y[0:5])
 
 # Split the dataset in two equal parts into 80:20 ratio for train:test
 X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=0)
-
+    X, y, test_size=0.2, random_state=42)
 
 # This is a key step where you define the parameters and their possible values
 # that you would like to check.
-tuned_parameters = [{'kernel': ['rbf', 'linear'], 'gamma': [1e-3, 1e-4],
-                     'C': [1, 10, 100, 1000]}
-                    ]
+tuned_parameters = [{'n_estimators': [50, 75, 100, 125, 150],
+                     'criterion': ['gini', 'entropy'],
+                     'max_depth': [None, 10, 20, 30],
+                     'max_features': ['auto', None, 'log2', 'sqrt']}]
 
-# We are going to limit ourselves to accuracy score, other options can be
-# seen here:
-# http://scikit-learn.org/stable/modules/model_evaluation.html#scoring-parameter
-# Some other values used are the predcision_macro, recall_macro
 scores = ['accuracy']
 
 for score in scores:
     print("# Tuning hyper-parameters for %s" % score)
     print()
 
-    clf = GridSearchCV(SVC(), tuned_parameters, cv=5,
+    clf = GridSearchCV(RandomForestClassifier(), tuned_parameters, cv=5,
                        scoring='%s' % score)
     clf.fit(X_train, y_train)
 
@@ -79,6 +95,3 @@ for score in scores:
     print(accuracy_score(y_true, y_pred))
 
     print()
-
-# Note the problem is too easy: the hyperparameter plateau is too flat and the
-# output model is the same for precision and recall with ties in quality.

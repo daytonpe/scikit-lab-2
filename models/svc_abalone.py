@@ -12,6 +12,7 @@ from sklearn.metrics import classification_report
 from sklearn.metrics import confusion_matrix
 from sklearn.metrics import accuracy_score
 from sklearn.svm import SVC
+from sklearn.model_selection import KFold
 import pandas as pd
 
 print(__doc__)
@@ -25,11 +26,10 @@ df = pd.read_csv('./data/abalone/abalone.csv',
                  names=['Sex', 'Length', 'Diam', 'Height', 'Whole',
                         'Shucked', 'Viscera', 'Shell', 'Rings'])
 
-# One hot encode 'Sex' column
-df = pd.get_dummies(df, columns=['Sex'])
 
-# Convert all values to floats
-df = df.astype(float)
+# One hot encode 'Sex' column in abalone dataset
+df = pd.get_dummies(df, columns=['Sex'])
+# df.drop(['Sex'], axis=1, inplace=True)
 
 print(df[0:5])
 
@@ -70,7 +70,7 @@ for score in scores:
     print("# Tuning hyper-parameters for %s" % score)
     print()
 
-    clf = GridSearchCV(SVC(), tuned_parameters, cv=2,
+    clf = GridSearchCV(SVC(), tuned_parameters, cv=KFold(n_splits=3),
                        scoring='%s' % score)
     clf.fit(X_train, y_train)
 
