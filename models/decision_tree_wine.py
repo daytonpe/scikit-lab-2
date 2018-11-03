@@ -1,8 +1,3 @@
-# This example has been taken from SciKit documentation and has been
-# modifified to suit this assignment. You are free to make changes, but you
-# need to perform the task asked in the lab assignment
-
-
 from __future__ import print_function
 
 from sklearn import datasets
@@ -13,14 +8,20 @@ from sklearn.metrics import confusion_matrix
 from sklearn.metrics import accuracy_score
 from sklearn.tree import DecisionTreeClassifier
 import pandas as pd
+import argparse
 
 print(__doc__)
+
+parser = argparse.ArgumentParser(description='Train classifier.')
+parser.add_argument('data_path', action="store")
+args = parser.parse_args()
 
 pd.set_option('display.max_columns', 500)
 pd.set_option('display.width', 1000)
 
 # Abalone Data
-df = pd.read_csv('./data/wine/wine.csv',
+# ./data/wine/wine.csv
+df = pd.read_csv(args.data_path,
                  header=None,
                  names=['Quality',
                         'Alcohol',
@@ -36,7 +37,6 @@ df = pd.read_csv('./data/wine/wine.csv',
                         'Hue',
                         'OD280/OD315',
                         'Proline'])
-
 
 print(df[0:5])
 

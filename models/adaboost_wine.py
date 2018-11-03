@@ -13,14 +13,20 @@ from sklearn.metrics import confusion_matrix
 from sklearn.metrics import accuracy_score
 from sklearn.ensemble import AdaBoostClassifier
 import pandas as pd
+import argparse
 
 print(__doc__)
+
+parser = argparse.ArgumentParser(description='Train classifier.')
+parser.add_argument('data_path', action="store")
+args = parser.parse_args()
 
 pd.set_option('display.max_columns', 500)
 pd.set_option('display.width', 1000)
 
 # Abalone Data
-df = pd.read_csv('./data/wine/wine.csv',
+# ./data/wine/wine.csv
+df = pd.read_csv(args.data_path,
                  header=None,
                  names=['Quality',
                         'Alcohol',
@@ -36,7 +42,6 @@ df = pd.read_csv('./data/wine/wine.csv',
                         'Hue',
                         'OD280/OD315',
                         'Proline'])
-
 
 print(df[0:5])
 
